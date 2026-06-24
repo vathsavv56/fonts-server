@@ -2,7 +2,6 @@
   "name": "font-server",
   "version": "1.0.0",
   "description": "A Vercel-deployed font hosting server with auto-generated @font-face CSS",
-  "type": "module",
   "main": "api/index.ts",
   "scripts": {
     "dev": "bun run dev-server.ts --watch",
