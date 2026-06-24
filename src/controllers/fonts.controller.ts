@@ -267,8 +267,80 @@ export function renderFontsPage(_req: Request, res: Response): void {
       }
       .font-header {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
+        align-items: flex-start;
       }
+    }
+    dialog {
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-header h3 {
+      margin: 0;
+      font-weight: 500;
+    }
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+    .btn-close:hover {
+      color: var(--text);
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    .modal-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin: 0 0 0.5rem 0;
+    }
+    pre {
+      background: rgba(128, 128, 128, 0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+    }
+    pre:last-child {
+      margin-bottom: 0;
+    }
+    .btn-get-code {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-get-code:hover {
+      opacity: 0.8;
     }
   </style>
 </head>
@@ -305,8 +377,11 @@ export function renderFontsPage(_req: Request, res: Response): void {
         html += `
     <div class="font-card">
       <div class="font-header">
-        <h2 class="font-family">${family.family}</h2>
-        <div class="variants">${variants}</div>
+        <div>
+          <h2 class="font-family">${family.family}</h2>
+          <div class="variants">${variants}</div>
+        </div>
+        <button class="btn-get-code" data-family="${family.family}">Get Code</button>
       </div>
       <div class="preview-text" style="font-family: '${family.family}', sans-serif;" contenteditable="true" spellcheck="false">
         The quick brown fox jumps over the lazy dog
@@ -318,6 +393,47 @@ export function renderFontsPage(_req: Request, res: Response): void {
 
     html += `
   </main>
+
+  <dialog id="codeModal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Font Code</h3>
+      <button id="closeModal" class="btn-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-label">1. Import the CSS</p>
+      <pre><code id="codeImport"></code></pre>
+      <p class="modal-label">2. Use the font family</p>
+      <pre><code id="codeFamily"></code></pre>
+    </div>
+  </dialog>
+
+  <script>
+    const modal = document.getElementById('codeModal');
+    const closeBtn = document.getElementById('closeModal');
+    const codeImport = document.getElementById('codeImport');
+    const codeFamily = document.getElementById('codeFamily');
+    const title = document.getElementById('modalTitle');
+
+    document.querySelectorAll('.btn-get-code').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const family = btn.getAttribute('data-family');
+        title.textContent = "Use " + family;
+        codeImport.textContent = \`@import url('\${window.location.origin}/fonts.css');\`;
+        codeFamily.textContent = \`font-family: '\${family}', sans-serif;\`;
+        modal.showModal();
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.close();
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.close();
+      }
+    });
+  </script>
 </body>
 </html>`;
 
