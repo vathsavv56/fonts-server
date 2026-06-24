@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "bun install && tsc --noEmit",
+  "buildCommand": "bun install && npx tsc --noEmit",
   "env": {
     "NODE_ENV": "production"
   },

@@ -23,8 +23,7 @@ import path from "path";
 
 const FONTS_DIR = process.env.FONTS_DIR || "public/fonts";
 
-// Track the initial state so we can detect changes
-const initialState = new Map<string, number>();
+
 
 /**
  * Build initial state map of all files and their mtimes.

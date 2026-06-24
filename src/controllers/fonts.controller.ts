@@ -25,7 +25,7 @@ import { config } from "../config";
  * Each block includes font-display: swap for performance.
  * URLs point directly to the static CDN (no proxy through this function).
  */
-export function generateFontsCss(req: Request, res: Response): void {
+export function generateFontsCss(_req: Request, res: Response): void {
   try {
     const families = scanFonts(config.FONTS_DIR);
 
@@ -71,7 +71,7 @@ export function generateFontsCss(req: Request, res: Response): void {
  * Includes family name, file metadata, and public URLs.
  * Safe to expose — no filesystem paths, only public URLs.
  */
-export function getFontsList(req: Request, res: Response): void {
+export function getFontsList(_req: Request, res: Response): void {
   try {
     const families = scanFonts(config.FONTS_DIR);
     const totalFonts = families.reduce((sum, f) => sum + f.files.length, 0);
@@ -112,7 +112,7 @@ export function getFontsList(req: Request, res: Response): void {
  * Returns status, number of fonts loaded, and timestamp.
  * No uptime field — serverless functions are stateless per-invocation.
  */
-export function getHealth(req: Request, res: Response): void {
+export function getHealth(_req: Request, res: Response): void {
   try {
     const families = scanFonts(config.FONTS_DIR);
     const fontsLoaded = families.reduce((sum, f) => sum + f.files.length, 0);
