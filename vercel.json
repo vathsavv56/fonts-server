@@ -46,6 +46,10 @@
     {
       "source": "/health",
       "destination": "/api"
+    },
+    {
+      "source": "/page",
+      "destination": "/api"
     }
   ]
 }

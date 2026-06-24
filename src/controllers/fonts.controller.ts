@@ -138,8 +138,186 @@ export function getHealth(_req: Request, res: Response): void {
   }
 }
 
+export function renderFontsPage(_req: Request, res: Response): void {
+  try {
+    const families = scanFonts(config.FONTS_DIR);
+    const totalFonts = families.reduce((sum, f) => sum + f.files.length, 0);
+
+    let html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Fonts | Font Server</title>
+  <link rel="stylesheet" href="/fonts.css">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --border: #334155;
+      --radius: 12px;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    header {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stats {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    main {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+    .font-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .font-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border-color: var(--primary);
+    }
+    .font-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    .font-family {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+    }
+    .file-count {
+      background: var(--bg);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      color: var(--primary);
+    }
+    .preview-text {
+      font-size: 2rem;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .variants {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .variant-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Font Server</h1>
+    <div class="stats">Serving ${totalFonts} font files across ${families.length} families</div>
+  </header>
+  <main>
+`;
+
+    if (families.length === 0) {
+      html += `
+    <div class="empty-state">
+      <h2>No fonts found</h2>
+      <p>Drop some .woff2 files into public/fonts/&lt;FamilyName&gt;/ to see them here.</p>
+    </div>
+`;
+    } else {
+      for (const family of families) {
+        html += `
+    <div class="font-card">
+      <div class="font-header">
+        <h2 class="font-family">${family.family}</h2>
+        <span class="file-count">${family.files.length} variant${family.files.length === 1 ? '' : 's'}</span>
+      </div>
+      <div class="preview-text" style="font-family: '${family.family}', sans-serif;">
+        The quick brown fox jumps over the lazy dog.
+      </div>
+      <div class="variants">
+`;
+        for (const file of family.files) {
+          html += `        <span class="variant-badge">${file.weight} ${file.style}</span>\n`;
+        }
+        html += `
+      </div>
+    </div>
+`;
+      }
+    }
+
+    html += `
+  </main>
+</body>
+</html>`;
+
+    res.set("Content-Type", "text/html");
+    res.set("Cache-Control", "public, max-age=60");
+    res.send(html);
+  } catch (err) {
+    console.error(
+      "[page] Error generating HTML:",
+      err instanceof Error ? err.message : String(err),
+    );
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 export default {
   generateFontsCss,
   getFontsList,
   getHealth,
+  renderFontsPage,
 };

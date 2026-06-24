@@ -19,7 +19,7 @@ import express, { Express } from "express";
 import path from "path";
 import helmet from "helmet";
 import { loggerMiddleware } from "./middleware/logger.middleware";
-import { generateFontsCss } from "./controllers/fonts.controller";
+import { generateFontsCss, renderFontsPage } from "./controllers/fonts.controller";
 import { corsMiddleware } from "./middleware/cors.middleware";
 import fontsRoutes from "./routes/fonts.routes";
 import healthRoutes from "./routes/health.routes";
@@ -74,8 +74,11 @@ app.use(express.json());
  *
  * /api/health, /health → health check
  *   GET /api/health → { status, fontsLoaded, timestamp }
+ *
+ * GET /page → dynamic HTML font preview page
  */
 app.get("/fonts.css", corsMiddleware, generateFontsCss);
+app.get("/page", renderFontsPage);
 app.use("/api/fonts", fontsRoutes);
 app.use("/api/health", healthRoutes);
 
