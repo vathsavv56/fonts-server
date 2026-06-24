@@ -4,6 +4,13 @@
  * Works both in local Bun environment and Vercel serverless deployment.
  */
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Resolve __dirname for ESM compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export const config = {
   /**
    * PUBLIC_URL: The base URL where fonts are publicly accessible.
@@ -24,20 +31,12 @@ export const config = {
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || "*",
 
   /**
-   * FONTS_DIR: Relative path to the fonts directory.
-   * Must contain subdirectories for font families.
-   * Example structure:
-   *   public/fonts/
-   *     Inter/
-   *       Inter-Regular.woff2
-   *       Inter-Bold.woff2
-   *     Lora/
-   *       Lora-Italic.woff2
-   *
-   * Works relative to the project root in local dev,
-   * and relative to the function's bundled filesystem in Vercel.
+   * FONTS_DIR: Absolute path to the fonts directory.
+   * Resolved relative to this file's location (src/config.ts → project root → public/fonts)
+   * so it works in both local dev (cwd = project root) and Vercel
+   * (cwd may differ, but __dirname is reliable).
    */
-  FONTS_DIR: process.env.FONTS_DIR || "public/fonts",
+  FONTS_DIR: process.env.FONTS_DIR || path.resolve(__dirname, "..", "public", "fonts"),
 
   /**
    * NODE_ENV: Deployment environment (production, development, etc.).

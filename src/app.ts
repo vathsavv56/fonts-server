@@ -28,13 +28,16 @@ import healthRoutes from "./routes/health.routes";
 const app: Express = express();
 
 /**
- * Static file serving for local development.
+ * Static file serving for local development ONLY.
  * On Vercel, the CDN automatically serves everything in public/ at the root path
  * (e.g., public/fonts/Inter/Inter-Bold.woff2 → /fonts/Inter/Inter-Bold.woff2).
  * Locally, we replicate this with express.static so font files are reachable
  * at the same URLs during development.
+ * This must NOT run on Vercel — the public/ dir is not in the function bundle.
  */
-app.use(express.static(path.join(process.cwd(), "public")));
+if (process.env.NODE_ENV !== "production") {
+  app.use(express.static(path.join(process.cwd(), "public")));
+}
 
 /**
  * Security headers via Helmet.

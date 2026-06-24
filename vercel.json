@@ -1,8 +1,14 @@
 {
   "version": 2,
   "buildCommand": "bun install && npx tsc --noEmit",
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "public/fonts/**"
+    }
+  },
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "PUBLIC_URL": "https://fonts-server.vercel.app"
   },
   "headers": [
     {
