@@ -50,9 +50,9 @@ export function generateFontsCss(_req: Request, res: Response): void {
       }
     }
 
-    // Cache for 5 minutes (short, since fonts can be redeployed at any time)
+    // Cache at the edge for 1 hour, serve stale for up to 24 hours while regenerating
     res.set("Content-Type", "text/css");
-    res.set("Cache-Control", "public, max-age=300");
+    res.set("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
     res.send(css);
   } catch (err) {
     console.error(
@@ -91,9 +91,9 @@ export function getFontsList(_req: Request, res: Response): void {
       })),
     };
 
-    // Cache for 5 minutes
+    // Cache at the edge for 1 hour, serve stale for up to 24 hours while regenerating
     res.set("Content-Type", "application/json");
-    res.set("Cache-Control", "public, max-age=300");
+    res.set("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
     res.json(result);
   } catch (err) {
     console.error(
@@ -156,6 +156,9 @@ export function renderFontsPage(_req: Request, res: Response): void {
       --text: #111111;
       --text-muted: #888888;
       --border: #eaeaea;
+      --preview-size: 5rem;
+      --preview-lh: 1.1;
+      --preview-ls: -0.02em;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -183,10 +186,13 @@ export function renderFontsPage(_req: Request, res: Response): void {
       max-width: 1200px;
       margin: 0 auto;
       padding: 4rem 2rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
     }
     .header-left {
       display: flex;
@@ -218,6 +224,30 @@ export function renderFontsPage(_req: Request, res: Response): void {
     .social-link:hover {
       color: var(--text);
     }
+    .toolbar {
+      display: flex;
+      gap: 2rem;
+      background: rgba(var(--bg-rgb), 0.8);
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+    }
+    .control-group label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    input[type=range] {
+      accent-color: var(--text);
+      width: 100%;
+      cursor: pointer;
+    }
     main {
       max-width: 1200px;
       margin: 0 auto;
@@ -245,10 +275,28 @@ export function renderFontsPage(_req: Request, res: Response): void {
       font-size: 0.875rem;
       color: var(--text-muted);
     }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .weight-control {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .weight-control label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      min-width: 45px;
+    }
+    .weight-control input {
+      width: 100px;
+    }
     .preview-text {
-      font-size: 5rem;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      font-size: var(--preview-size);
+      line-height: var(--preview-lh);
+      letter-spacing: var(--preview-ls);
       outline: none;
       word-wrap: break-word;
       transition: opacity 0.2s;
@@ -346,20 +394,36 @@ export function renderFontsPage(_req: Request, res: Response): void {
 </head>
 <body>
   <header>
-    <div class="header-left">
-      <h1>Fonts</h1>
-      <div class="stats">${families.length} families &middot; ${totalFonts} files</div>
+    <div class="header-top">
+      <div class="header-left">
+        <h1>Fonts</h1>
+        <div class="stats">${families.length} families &middot; ${totalFonts} files</div>
+      </div>
+      <div class="header-right">
+        <a href="https://github.com/vathsavv56/fonts-server" target="_blank" rel="noopener noreferrer" class="social-link" title="GitHub">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        </a>
+        <a href="https://vathsavv56.vercel.app" target="_blank" rel="noopener noreferrer" class="social-link" title="Portfolio">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        </a>
+        <a href="mailto:inavoluvathsav@gmail.com" class="social-link" title="Email">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </a>
+      </div>
     </div>
-    <div class="header-right">
-      <a href="https://github.com/vathsavv56/fonts-server" target="_blank" rel="noopener noreferrer" class="social-link" title="GitHub">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
-      </a>
-      <a href="https://vathsavv56.vercel.app" target="_blank" rel="noopener noreferrer" class="social-link" title="Portfolio">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-      </a>
-      <a href="mailto:inavoluvathsav@gmail.com" class="social-link" title="Email">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-      </a>
+    <div class="toolbar">
+      <div class="control-group">
+        <label>Size <span id="sizeVal">5rem</span></label>
+        <input type="range" id="sizeSlider" min="1" max="10" step="0.25" value="5">
+      </div>
+      <div class="control-group">
+        <label>Line Height <span id="lhVal">1.1</span></label>
+        <input type="range" id="lhSlider" min="0.8" max="2.5" step="0.1" value="1.1">
+      </div>
+      <div class="control-group">
+        <label>Spacing <span id="lsVal">-0.02em</span></label>
+        <input type="range" id="lsSlider" min="-0.1" max="0.5" step="0.01" value="-0.02">
+      </div>
     </div>
   </header>
   <main>
@@ -381,9 +445,15 @@ export function renderFontsPage(_req: Request, res: Response): void {
           <h2 class="font-family">${family.family}</h2>
           <div class="variants">${variants}</div>
         </div>
-        <button class="btn-get-code" data-family="${family.family}">Get Code</button>
+        <div class="card-actions">
+          <div class="weight-control">
+            <label id="weightVal-${family.family.replace(/\s+/g, '-')}">400</label>
+            <input type="range" class="weight-slider" min="100" max="900" step="1" value="400" data-family="${family.family.replace(/\s+/g, '-')}">
+          </div>
+          <button class="btn-get-code" data-family="${family.family}">Get Code</button>
+        </div>
       </div>
-      <div class="preview-text" style="font-family: '${family.family}', sans-serif;" contenteditable="true" spellcheck="false">
+      <div class="preview-text" id="preview-${family.family.replace(/\s+/g, '-')}" style="font-family: '${family.family}', sans-serif;" contenteditable="true" spellcheck="false">
         The quick brown fox jumps over the lazy dog
       </div>
     </div>
@@ -434,6 +504,36 @@ export function renderFontsPage(_req: Request, res: Response): void {
       if (e.target === modal) {
         modal.close();
       }
+    });
+
+    // Global Sliders
+    const sizeSlider = document.getElementById('sizeSlider');
+    const lhSlider = document.getElementById('lhSlider');
+    const lsSlider = document.getElementById('lsSlider');
+
+    sizeSlider.addEventListener('input', (e) => {
+      document.documentElement.style.setProperty('--preview-size', e.target.value + 'rem');
+      document.getElementById('sizeVal').textContent = e.target.value + 'rem';
+    });
+
+    lhSlider.addEventListener('input', (e) => {
+      document.documentElement.style.setProperty('--preview-lh', e.target.value);
+      document.getElementById('lhVal').textContent = e.target.value;
+    });
+
+    lsSlider.addEventListener('input', (e) => {
+      document.documentElement.style.setProperty('--preview-ls', e.target.value + 'em');
+      document.getElementById('lsVal').textContent = e.target.value + 'em';
+    });
+
+    // Per-card Weight Sliders
+    document.querySelectorAll('.weight-slider').forEach(slider => {
+      slider.addEventListener('input', (e) => {
+        const familyId = e.target.getAttribute('data-family');
+        const weight = e.target.value;
+        document.getElementById('preview-' + familyId).style.fontWeight = weight;
+        document.getElementById('weightVal-' + familyId).textContent = weight;
+      });
     });
   </script>
 </body>
