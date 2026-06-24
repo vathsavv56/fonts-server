@@ -148,122 +148,147 @@ export function renderFontsPage(_req: Request, res: Response): void {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Available Fonts | Font Server</title>
+  <title>Fonts</title>
   <link rel="stylesheet" href="/fonts.css">
   <style>
     :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #3b82f6;
-      --border: #334155;
-      --radius: 12px;
+      --bg: #ffffff;
+      --text: #111111;
+      --text-muted: #888888;
+      --border: #eaeaea;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --text: #ededed;
+        --text-muted: #666666;
+        --border: #222222;
+      }
     }
     body {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
       padding: 0;
-      line-height: 1.6;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    ::selection {
+      background: var(--text);
+      color: var(--bg);
     }
     header {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(10px);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       border-bottom: 1px solid var(--border);
-      padding: 2rem;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    }
+    .header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
     }
     h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: 2.5rem;
-      background: linear-gradient(135deg, #60a5fa, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
     }
     .stats {
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 0.875rem;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .social-link {
+      color: var(--text-muted);
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .social-link:hover {
+      color: var(--text);
     }
     main {
       max-width: 1200px;
-      margin: 3rem auto;
+      margin: 0 auto;
       padding: 0 2rem;
-      display: grid;
-      gap: 2rem;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
     .font-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      transition: transform 0.2s, box-shadow 0.2s;
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border);
     }
-    .font-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      border-color: var(--primary);
+    .font-card:last-child {
+      border-bottom: none;
     }
     .font-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
+      align-items: baseline;
+      margin-bottom: 2rem;
     }
     .font-family {
       font-size: 1.5rem;
-      font-weight: bold;
+      font-weight: 500;
       margin: 0;
     }
-    .file-count {
-      background: var(--bg);
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
+    .variants {
       font-size: 0.875rem;
-      color: var(--primary);
+      color: var(--text-muted);
     }
     .preview-text {
-      font-size: 2rem;
-      line-height: 1.2;
-      margin-bottom: 1.5rem;
-      overflow-wrap: break-word;
-      word-break: break-word;
+      font-size: 5rem;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      outline: none;
+      word-wrap: break-word;
+      transition: opacity 0.2s;
     }
-    .variants {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .variant-badge {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
+    .preview-text:focus {
+      opacity: 0.8;
     }
     .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 4rem;
-      background: var(--surface);
-      border-radius: var(--radius);
-      border: 1px dashed var(--border);
+      padding: 4rem 0;
       color: var(--text-muted);
+      font-size: 1rem;
+    }
+    @media (max-width: 768px) {
+      .preview-text {
+        font-size: 3rem;
+      }
+      .font-header {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Font Server</h1>
-    <div class="stats">Serving ${totalFonts} font files across ${families.length} families</div>
+    <div class="header-left">
+      <h1>Fonts</h1>
+      <div class="stats">${families.length} families &middot; ${totalFonts} files</div>
+    </div>
+    <div class="header-right">
+      <a href="https://github.com/vathsavv56/fonts-server" target="_blank" rel="noopener noreferrer" class="social-link" title="GitHub">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+      </a>
+      <a href="https://vathsavv56.vercel.app" target="_blank" rel="noopener noreferrer" class="social-link" title="Portfolio">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+      </a>
+      <a href="mailto:inavoluvathsav@gmail.com" class="social-link" title="Email">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+      </a>
+    </div>
   </header>
   <main>
 `;
@@ -271,27 +296,20 @@ export function renderFontsPage(_req: Request, res: Response): void {
     if (families.length === 0) {
       html += `
     <div class="empty-state">
-      <h2>No fonts found</h2>
-      <p>Drop some .woff2 files into public/fonts/&lt;FamilyName&gt;/ to see them here.</p>
+      No fonts found. Add .woff2 files to public/fonts/&lt;FamilyName&gt;/.
     </div>
 `;
     } else {
       for (const family of families) {
+        const variants = family.files.map(f => `${f.weight} ${f.style}`).join(', ');
         html += `
     <div class="font-card">
       <div class="font-header">
         <h2 class="font-family">${family.family}</h2>
-        <span class="file-count">${family.files.length} variant${family.files.length === 1 ? '' : 's'}</span>
+        <div class="variants">${variants}</div>
       </div>
-      <div class="preview-text" style="font-family: '${family.family}', sans-serif;">
-        The quick brown fox jumps over the lazy dog.
-      </div>
-      <div class="variants">
-`;
-        for (const file of family.files) {
-          html += `        <span class="variant-badge">${file.weight} ${file.style}</span>\n`;
-        }
-        html += `
+      <div class="preview-text" style="font-family: '${family.family}', sans-serif;" contenteditable="true" spellcheck="false">
+        The quick brown fox jumps over the lazy dog
       </div>
     </div>
 `;
