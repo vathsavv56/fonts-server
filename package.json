@@ -1,0 +1,36 @@
+{
+  "name": "font-server",
+  "version": "1.0.0",
+  "description": "A Vercel-deployed font hosting server with auto-generated @font-face CSS",
+  "type": "module",
+  "main": "api/index.ts",
+  "scripts": {
+    "dev": "bun run dev-server.ts --watch",
+    "watch:fonts": "bun run src/dev/watch-fonts.ts",
+    "build": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "start": "node api/index.ts"
+  },
+  "keywords": [
+    "font",
+    "hosting",
+    "vercel",
+    "serverless",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0",
+    "@types/express": "^4.17.17",
+    "@types/cors": "^2.8.13",
+    "@types/node": "^20.3.1",
+    "typescript": "^5.1.3"
+  }
+}

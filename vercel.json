@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "buildCommand": "bun install && tsc --noEmit",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "headers": [
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/fonts.css",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/fonts.css",
+      "destination": "/api"
+    },
+    {
+      "source": "/fonts/list",
+      "destination": "/api/fonts/list"
+    },
+    {
+      "source": "/health",
+      "destination": "/api"
+    }
+  ]
+}
