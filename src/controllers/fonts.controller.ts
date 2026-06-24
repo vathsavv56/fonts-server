@@ -414,11 +414,13 @@ export function renderFontsPage(_req: Request, res: Response): void {
     const codeFamily = document.getElementById('codeFamily');
     const title = document.getElementById('modalTitle');
 
+    const baseUrl = '${config.PUBLIC_URL || "https://fonts-server.vercel.app"}';
+
     document.querySelectorAll('.btn-get-code').forEach(btn => {
       btn.addEventListener('click', () => {
         const family = btn.getAttribute('data-family');
         title.textContent = "Use " + family;
-        codeImport.textContent = \`@import url('\${window.location.origin}/fonts.css');\`;
+        codeImport.textContent = \`@import url('\${baseUrl}/fonts.css');\`;
         codeFamily.textContent = \`font-family: '\${family}', sans-serif;\`;
         modal.showModal();
       });
@@ -438,7 +440,6 @@ export function renderFontsPage(_req: Request, res: Response): void {
 </html>`;
 
     res.set("Content-Type", "text/html");
-    res.set("Cache-Control", "public, max-age=60");
     res.send(html);
   } catch (err) {
     console.error(
